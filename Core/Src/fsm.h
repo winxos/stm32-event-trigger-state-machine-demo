@@ -11,8 +11,7 @@
 enum {
     SIG_ENTRY = 1,
 	SIG_TICK,
-	SIG_KEYPRESS,
-	SIG_SCREEN_RST,
+	SIG_KEYPRESS
 };
 #define EVENT_Q_SZ		(10)
 #define EVENT_MSG_SZ	(15)
@@ -30,7 +29,6 @@ typedef struct{
 extern State *me;
 #define TASK_TO(_target) (me->state = (pFunPtr)_target,event_push(SIG_ENTRY))
 #define SIG(me)	((uint8_t)(me->evt.sig))
-void state_dispatcher();
 
 void fsm_init();
 #endif /* SRC_FSM_H_ */

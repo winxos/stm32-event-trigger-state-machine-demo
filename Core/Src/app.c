@@ -19,15 +19,21 @@ void show_mem()
 {
 	log_d("f1 mem rest:%d, head:%d",uxTaskGetStackHighWaterMark(NULL),xPortGetFreeHeapSize());
 }
+void success()
+{
+	log_d("rx success");
+}
+void fail()
+{
+	log_d("rx failed");
+}
 static void task_action(State * const me)
 {
 	log_d("task entry");
-	show_mem();
 }
 static void task_tick(State * const me)
 {
-	log_d("task tick");
-	show_mem();
+	drv_modbus_read_regs(1, 0, 1, success, fail);
 }
 void task_idle(State * const me)
 {
@@ -44,6 +50,7 @@ void task_idle(State * const me)
 void recv(uint8_t *data, uint32_t len)
 {
 	log_d("rx %d",len);
+	show_mem();
 }
 void led_blink(void *p)
 {
@@ -59,16 +66,16 @@ void system_run()
 {
 	show_mem();
 	drv_uart_init();
+	drv_modbus_init(0);
 	fsm_init();
 	show_mem();
 	t_ledblink = osTimerNew(led_blink, osTimerPeriodic, NULL, &ledblink_attr);
 	osTimerStart(t_ledblink, 1000);
 	show_mem();
 	TASK_TO(task_idle);
-	drv_uart_set_callback(0, recv);
+	drv_uart_set_callback(1, recv);
 	while(1)
 	{
-		state_dispatcher();
-		osDelay(1);
+		osDelay(1000);
 	}
 }

@@ -12,6 +12,8 @@
 #include <cmsis_os2.h>
 #include <main.h>
 #include <stm32f1xx_hal.h>
+#include <string.h>
 #include "fsm.h"
 #include "drv_uart.h"
+#include "drv_modbus.h"
 #endif /* SRC_COMMON_H_ */

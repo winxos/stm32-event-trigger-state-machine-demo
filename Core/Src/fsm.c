@@ -5,11 +5,8 @@
  *      Author: wvv
  */
 #include "common.h"
-osMessageQueueId_t q_t;
-void fsm_init()
-{
-	q_t = osMessageQueueNew(EVENT_Q_SZ, sizeof(Event), NULL);
-}
+static osMessageQueueId_t q_t;
+
 void event_push_arg(Event e)
 {
 	osMessageQueuePut(q_t, &e, 0U, 0U);
@@ -22,13 +19,28 @@ void event_push(uint8_t e)
 static State s;
 State *me = &s;
 
-void state_dispatcher()
+static void state_dispatcher()
 {
-	if(osOK == osMessageQueueGet(q_t, &me->evt, NULL, 0))
+	while(TRUE)
 	{
-        if(me->state)
-        {
-            me->state(me);
-        }
+		if(osOK == osMessageQueueGet(q_t, &me->evt, NULL, osWaitForever))
+		{
+	        if(me->state)
+	        {
+	            me->state(me);
+	        }
+		}
+		osThreadYield();
 	}
+}
+static osThreadId_t _th;
+static const osThreadAttr_t _attr = {
+  .name = "fsm",
+  .stack_size = 2048,
+  .priority = (osPriority_t) osPriorityAboveNormal,
+};
+void fsm_init()
+{
+	q_t = osMessageQueueNew(EVENT_Q_SZ, sizeof(Event), NULL);
+	_th = osThreadNew(state_dispatcher, NULL, &_attr);
 }

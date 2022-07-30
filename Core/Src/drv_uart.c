@@ -88,15 +88,15 @@ void drv_uart_loop()
 				_uarts[id].state = S_UART_IDLE;
 			}
 		}
-		osDelay(10);
+		osThreadYield();
 	}
 }
-osTimerId_t t_uart_tick;
-const osTimerAttr_t t_uart_tick_attr = {
+static osTimerId_t _tick;
+static const osTimerAttr_t _tick_attr = {
   .name = "uart_tick"
 };
-osThreadId_t uart_th;
-const osThreadAttr_t uart_th_attr = {
+static osThreadId_t _th;
+static const osThreadAttr_t _th_attr = {
   .name = "uart",
   .stack_size = 1024,
   .priority = (osPriority_t) osPriorityHigh,
@@ -108,7 +108,7 @@ void drv_uart_init()
 		HAL_UART_Receive_IT(_uarts[id].huart, &_uarts[id].buf, 1);
 	}
 	rx_sem = osSemaphoreNew(1, 0, NULL);
-	t_uart_tick = osTimerNew(drv_uart_tick, osTimerPeriodic, NULL, &t_uart_tick_attr);
-	osTimerStart(t_uart_tick, 1);
-	uart_th = osThreadNew(drv_uart_loop, NULL, &uart_th_attr);
+	_tick = osTimerNew(drv_uart_tick, osTimerPeriodic, NULL, &_tick_attr);
+	osTimerStart(_tick, 1);
+	_th = osThreadNew(drv_uart_loop, NULL, &_th_attr);
 }
