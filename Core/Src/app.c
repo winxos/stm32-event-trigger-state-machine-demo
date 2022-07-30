@@ -47,11 +47,6 @@ void task_idle(State * const me)
         	break;
     }
 }
-void recv(uint8_t *data, uint32_t len)
-{
-	log_d("rx %d",len);
-	show_mem();
-}
 void led_blink(void *p)
 {
 	HAL_GPIO_TogglePin(LED0_GPIO_Port, LED0_Pin);
@@ -73,7 +68,6 @@ void system_run()
 	osTimerStart(t_ledblink, 1000);
 	show_mem();
 	TASK_TO(task_idle);
-	drv_uart_set_callback(1, recv);
 	while(1)
 	{
 		osDelay(1000);

@@ -6,7 +6,7 @@
  */
 #include "common.h"
 static uint8_t MODBUS_MASTER_UART = 0;
-#define TIMEOUT 	5000
+#define TIMEOUT 	50
 #define MSG_SIZE	8
 #define MSG_Q_SIZE 	20
 #define RX_MAX_SZ	30
